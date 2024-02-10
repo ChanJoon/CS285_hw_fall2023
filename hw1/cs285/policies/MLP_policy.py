@@ -141,10 +141,8 @@ class MLPPolicySL(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
         :return:
             dict: 'Training Loss': supervised learning loss
         """
-        observations = ptu.from_numpy(observations.astype(np.float32))
-        observations.requires_grad = True
-        actions = ptu.from_numpy(actions.astype(np.float32))
-        actions.requires_grad = True
+        observations = ptu.from_numpy(observations.astype(np.float32)).requires_grad_()
+        actions = ptu.from_numpy(actions.astype(np.float32)).requires_grad_()
         
         # TODO: update the policy and return the loss
         loss_fn = nn.MSELoss() # nn.NLLLoss()
