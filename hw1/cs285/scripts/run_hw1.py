@@ -20,7 +20,12 @@ from cs285.infrastructure.replay_buffer import ReplayBuffer
 from cs285.policies.MLP_policy import MLPPolicySL
 from cs285.policies.loaded_gaussian_policy import LoadedGaussianPolicy
 
+import sys
 
+if not sys.warnoptions:
+    import warnings
+    warnings.simplefilter("ignore")
+    
 # how many rollouts to save as videos to tensorboard
 MAX_NVIDEO = 2
 MAX_VIDEO_LEN = 40  # we overwrite this in the code below
@@ -67,6 +72,7 @@ def run_training_loop(params):
 
     # Maximum length for episodes
     params['ep_len'] = params['ep_len'] or env.spec.max_episode_steps
+    print('Maximum episode length is ', params['ep_len'])
     MAX_VIDEO_LEN = params['ep_len']
 
     assert isinstance(env.action_space, gym.spaces.Box), "Environment must be continuous"
@@ -202,6 +208,10 @@ def run_training_loop(params):
                 print('{} : {}'.format(key, value))
                 logger.log_scalar(value, key, itr)
             print('Done logging...\n\n')
+            
+            if itr == 0:
+                print(f"Is AverageReturn at least 30% of expert policy? {logs['Eval_AverageReturn']:.2f} > {0.3 * logs['Initial_DataCollection_AverageReturn']:.2f} ? {logs['Eval_AverageReturn'] > (0.3 * logs['Initial_DataCollection_AverageReturn'])}")
+                print(f"It achieves {logs['Eval_AverageReturn'] / logs['Initial_DataCollection_AverageReturn'] * 100:.2f}% of the expert policy's performance.")
 
             logger.flush()
 

@@ -146,8 +146,8 @@ class MLPPolicySL(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
         
         # TODO: update the policy and return the loss
         loss_fn = nn.MSELoss() # nn.NLLLoss()
-        sample_obs = self(observations).sample()
-        loss = loss_fn(sample_obs, actions)
+        sample_ac = self(observations).rsample()
+        loss = loss_fn(sample_ac, actions)
         
         self.optimizer.zero_grad()
         loss.backward()
