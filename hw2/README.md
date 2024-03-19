@@ -20,4 +20,106 @@ There are TODOs in these files:
 - `cs285/networks/critics.py`
 - `cs285/infrastructure/utils.py`
 
-See the [Assignment PDF](hw2.pdf) for more info.
+See the [Assignment PDF](https://rail.eecs.berkeley.edu/deeprlcourse/deeprlcourse/static/homeworks/hw2.pdf) for more info.
+
+## Experiment commands
+
+### Policy Gradients
+
+```bash
+# The small batch experiments
+python cs285/scripts/run_hw2.py --env_name CartPole-v0 \
+	-n 100 -b 1000 --exp_name cartpole --video_log_freq -1
+
+python cs285/scripts/run_hw2.py --env_name CartPole-v0 \
+	-n 100 -b 1000 -rtg --exp_name cartpole_rtg --video_log_freq -1
+
+python cs285/scripts/run_hw2.py --env_name CartPole-v0 \
+	-n 100 -b 1000 -na --exp_name cartpole_na --video_log_freq -1
+
+python cs285/scripts/run_hw2.py --env_name CartPole-v0 \
+	-n 100 -b 1000 -rtg -na --exp_name cartpole_rtg_na --video_log_freq -1
+
+# The large batch experiments
+python cs285/scripts/run_hw2.py --env_name CartPole-v0 \
+	-n 100 -b 4000 --exp_name cartpole_lb --video_log_freq -1
+
+python cs285/scripts/run_hw2.py --env_name CartPole-v0 \
+	-n 100 -b 4000 -rtg --exp_name cartpole_lb_rtg --video_log_freq -1
+
+python cs285/scripts/run_hw2.py --env_name CartPole-v0 \
+	-n 100 -b 4000 -na --exp_name cartpole_lb_na --video_log_freq -1
+
+python cs285/scripts/run_hw2.py --env_name CartPole-v0 \
+	-n 100 -b 4000 -rtg -na --exp_name cartpole_lb_rtg_na --video_log_freq -1
+```
+
+### Using a Neural Network Baseline
+
+```bash
+# No baseline experiment
+python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
+	-n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 --exp_name cheetah --video_log_freq -1
+
+# Baseline experiment
+python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
+	-n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
+	--use_baseline -blr 0.01 -bgs 5 --exp_name cheetah_baseline --video_log_freq -1
+
+# TODO Run with a decreased number of bgs or blr
+
+# TODO Add normalize advantages
+python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
+	-n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
+	--use_baseline -blr 0.01 -bgs 5 --exp_name cheetah_baseline --video_log_freq 10
+```
+
+### Implement Generalized Advantage Estimation
+
+```bash
+python cs285/scripts/run_hw2.py --env_name LunarLander-v2 \
+	--ep_len 1000 --discount 0.99 -n 300 -l 3-s 128 -b 2000 -lr 0.001 \
+	--use_reward_to_go --use_baseline --gae_lambda 0 --exp_name lunar_lander_lambda0 --video_log_freq -1
+
+python cs285/scripts/run_hw2.py --env_name LunarLander-v2 \
+	--ep_len 1000 --discount 0.99 -n 300 -l 3-s 128 -b 2000 -lr 0.001 \
+	--use_reward_to_go --use_baseline --gae_lambda 0.95 --exp_name lunar_lander_lambda0.95 --video_log_freq -1
+
+python cs285/scripts/run_hw2.py --env_name LunarLander-v2 \
+	--ep_len 1000 --discount 0.99 -n 300 -l 3-s 128 -b 2000 -lr 0.001 \
+	--use_reward_to_go --use_baseline --gae_lambda 0.98 --exp_name lunar_lander_lambda0.98 --video_log_freq -1
+
+python cs285/scripts/run_hw2.py --env_name LunarLander-v2 \
+	--ep_len 1000 --discount 0.99 -n 300 -l 3-s 128 -b 2000 -lr 0.001 \
+	--use_reward_to_go --use_baseline --gae_lambda 0.99 --exp_name lunar_lander_lambda0.99 --video_log_freq -1
+
+python cs285/scripts/run_hw2.py --env_name LunarLander-v2 \
+	--ep_len 1000 --discount 0.99 -n 300 -l 3-s 128 -b 2000 -lr 0.001 \
+	--use_reward_to_go --use_baseline --gae_lambda 1 --exp_name lunar_lander_lambda1 --video_log_freq -1
+```
+
+### Hyperparameters and Sample Efficiency
+
+```bash
+for seed in $(seq 1 5); do
+	python cs285/scripts/run_hw2.py --env_name InvertedPendulum-v4 -n 100 \
+		--exp_name pendulum_default_s$seed \
+		-rtg --use_baseline -na \
+		--batch_size 5000 \
+		--seed $seed --video_log_freq -1
+done
+
+# TODO
+```
+
+### Extra Credit: Humanoid
+
+```bash
+# TODO Run on Colab or Implement some optimizations
+python cs285/scripts/run_hw2.py \
+	--env_name Humanoid-v4 --ep_len 1000 \
+	--discount 0.99 -n 1000 -l 3 -s 256 -b 50000 -lr 0.001 \
+	--baseline_gradient_steps 50 \
+	-na --use_reward_to_go --use_baseline --gae_lambda 0.97 \
+	--exp_name humanoid --video_log_freq 5
+```

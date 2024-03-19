@@ -59,7 +59,8 @@ class MLPPolicy(nn.Module):
     def get_action(self, obs: np.ndarray) -> np.ndarray:
         """Takes a single observation (as a numpy array) and returns a single action (as a numpy array)."""
         # TODO: implement get_action
-        action = None
+        action = self(ptu.from_numpy(obs)).sample()
+        action = ptu.to_numpy(action)
 
         return action
 
@@ -70,12 +71,18 @@ class MLPPolicy(nn.Module):
         flexible objects, such as a `torch.distributions.Distribution` object. It's up to you!
         """
         if self.discrete:
-            # TODO: define the forward pass for a policy with a discrete action space.
-            pass
+            # DONE: define the forward pass for a policy with a discrete action space.
+            obs = self.logits_net(obs)
+            # MEMO: What is difference between softmax(obs) and Categorical(logits=obs) or Categorical(softmax(obs))?
+            dist = distributions.Categorical(logits=obs)
         else:
-            # TODO: define the forward pass for a policy with a continuous action space.
-            pass
-        return None
+            # DONE: define the forward pass for a policy with a continuous action space.
+            obs = self.mean_net(obs)
+            # MEMO: We can use Normal or MultivariateNormal.
+            # Since each dimension of action is not correlated, the covariance matrix is a positive definite diagonal matrix
+            # dist = distributions.Normal(loc=obs, scale=torch.exp(self.logstd))
+            dist = distributions.MultivariateNormal(loc=obs, covariance_matrix=torch.diag(torch.exp(self.logstd)))
+        return dist
 
     def update(self, obs: np.ndarray, actions: np.ndarray, *args, **kwargs) -> dict:
         """Performs one iteration of gradient descent on the provided batch of data."""
@@ -95,9 +102,18 @@ class MLPPolicyPG(MLPPolicy):
         obs = ptu.from_numpy(obs)
         actions = ptu.from_numpy(actions)
         advantages = ptu.from_numpy(advantages)
-
-        # TODO: implement the policy gradient actor update.
-        loss = None
+        
+        dist = self(obs)
+        # negative_likelihood = F.cross_entropy(dist, actions, reduction='none')
+        # loss = torch.mean(negative_likelihood * advantages)
+        pi_theta = dist.log_prob(actions)
+        
+        # DONE: implement the policy gradient actor update.
+        # MEMO: In NN libraries, the optimizer minimizes the loss. Therefore, you should pass the negative to the gradient equation.
+        loss = torch.neg(torch.mean(torch.mul(pi_theta, advantages)))
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
 
         return {
             "Actor Loss": ptu.to_numpy(loss),
