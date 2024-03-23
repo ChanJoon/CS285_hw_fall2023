@@ -177,7 +177,8 @@ class PGAgent(nn.Module):
         in each index t' is sum_{t'=t}^T gamma^(t'-t) * r_{t'}.
         """
         T = len(rewards)
-        gamma_pow_t = [self.gamma ** t for t in range(T)]
+        # MEMO: For element-wise multiplication, need to use np.array
+        gamma_pow_t = np.array([self.gamma ** t for t in range(T)])
         # MEMO: matmul or reverse(T) could be an alternative way.
         discounted_reward_to_go = [np.sum(gamma_pow_t[:T-t] * rewards[t:]) for t in range(T)]
         return discounted_reward_to_go

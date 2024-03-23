@@ -66,11 +66,28 @@ python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
 	-n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
 	--use_baseline -blr 0.01 -bgs 5 --exp_name cheetah_baseline --video_log_freq -1
 
-# TODO Run with a decreased number of bgs or blr
-
-# TODO Add normalize advantages
+# Run with a decreased number of bgs or blr
+# baseline gradient steps
 python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
 	-n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
+	--use_baseline -blr 0.01 -bgs 4 --exp_name cheetah_baseline --video_log_freq -1
+
+python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
+	-n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
+	--use_baseline -blr 0.01 -bgs 3 --exp_name cheetah_baseline --video_log_freq -1
+
+# baseline learning rate
+python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
+	-n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
+	--use_baseline -blr 0.02 -bgs 5 --exp_name cheetah_baseline --video_log_freq -1
+
+python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
+	-n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
+	--use_baseline -blr 0.03 -bgs 5 --exp_name cheetah_baseline --video_log_freq -1
+
+# Add normalize advantages for better performance (and record video of HalfCheetah walking)
+python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
+	-n 100 -b 5000 -na -rtg --discount 0.95 -lr 0.01 \
 	--use_baseline -blr 0.01 -bgs 5 --exp_name cheetah_baseline --video_log_freq 10
 ```
 
@@ -78,23 +95,23 @@ python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
 
 ```bash
 python cs285/scripts/run_hw2.py --env_name LunarLander-v2 \
-	--ep_len 1000 --discount 0.99 -n 300 -l 3-s 128 -b 2000 -lr 0.001 \
+	--ep_len 1000 --discount 0.99 -n 300 -l 3 -s 128 -b 2000 -lr 0.001 \
 	--use_reward_to_go --use_baseline --gae_lambda 0 --exp_name lunar_lander_lambda0 --video_log_freq -1
 
 python cs285/scripts/run_hw2.py --env_name LunarLander-v2 \
-	--ep_len 1000 --discount 0.99 -n 300 -l 3-s 128 -b 2000 -lr 0.001 \
+	--ep_len 1000 --discount 0.99 -n 300 -l 3 -s 128 -b 2000 -lr 0.001 \
 	--use_reward_to_go --use_baseline --gae_lambda 0.95 --exp_name lunar_lander_lambda0.95 --video_log_freq -1
 
 python cs285/scripts/run_hw2.py --env_name LunarLander-v2 \
-	--ep_len 1000 --discount 0.99 -n 300 -l 3-s 128 -b 2000 -lr 0.001 \
+	--ep_len 1000 --discount 0.99 -n 300 -l 3 -s 128 -b 2000 -lr 0.001 \
 	--use_reward_to_go --use_baseline --gae_lambda 0.98 --exp_name lunar_lander_lambda0.98 --video_log_freq -1
 
 python cs285/scripts/run_hw2.py --env_name LunarLander-v2 \
-	--ep_len 1000 --discount 0.99 -n 300 -l 3-s 128 -b 2000 -lr 0.001 \
+	--ep_len 1000 --discount 0.99 -n 300 -l 3 -s 128 -b 2000 -lr 0.001 \
 	--use_reward_to_go --use_baseline --gae_lambda 0.99 --exp_name lunar_lander_lambda0.99 --video_log_freq -1
 
 python cs285/scripts/run_hw2.py --env_name LunarLander-v2 \
-	--ep_len 1000 --discount 0.99 -n 300 -l 3-s 128 -b 2000 -lr 0.001 \
+	--ep_len 1000 --discount 0.99 -n 300 -l 3 -s 128 -b 2000 -lr 0.001 \
 	--use_reward_to_go --use_baseline --gae_lambda 1 --exp_name lunar_lander_lambda1 --video_log_freq -1
 ```
 
