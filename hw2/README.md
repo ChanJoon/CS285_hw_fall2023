@@ -1,3 +1,7 @@
+**TODO**
+- [ ] : Fix code implementations for a better performance(baseline, GAE)
+- [ ] : Answer `Hyperparameters and Sample Efficiency` and `Analysis` in hw2 handout
+
 ## Setup
 
 See [installation.md](installation.md). It's worth going through this again since some dependencies have changed since homework 1. You also need to make sure to run `pip install -e .` in the hw2 folder.
@@ -70,26 +74,28 @@ python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
 # baseline gradient steps
 python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
 	-n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
-	--use_baseline -blr 0.01 -bgs 4 --exp_name cheetah_baseline --video_log_freq -1
+	--use_baseline -blr 0.01 -bgs 4 --exp_name cheetah_baseline_bgs4 --video_log_freq -1
 
 python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
 	-n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
-	--use_baseline -blr 0.01 -bgs 3 --exp_name cheetah_baseline --video_log_freq -1
+	--use_baseline -blr 0.01 -bgs 3 --exp_name cheetah_baseline_bgs3 --video_log_freq -1
 
 # baseline learning rate
 python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
 	-n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
-	--use_baseline -blr 0.02 -bgs 5 --exp_name cheetah_baseline --video_log_freq -1
+	--use_baseline -blr 0.02 -bgs 5 --exp_name cheetah_baseline_blr2 --video_log_freq -1
 
 python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
 	-n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
-	--use_baseline -blr 0.03 -bgs 5 --exp_name cheetah_baseline --video_log_freq -1
+	--use_baseline -blr 0.03 -bgs 5 --exp_name cheetah_baseline_blr3 --video_log_freq -1
 
 # Add normalize advantages for better performance (and record video of HalfCheetah walking)
 python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
 	-n 100 -b 5000 -na -rtg --discount 0.95 -lr 0.01 \
-	--use_baseline -blr 0.01 -bgs 5 --exp_name cheetah_baseline --video_log_freq 10
+	--use_baseline -blr 0.01 -bgs 5 --exp_name cheetah_baseline_na --video_log_freq 10
 ```
+**Recorded video of HalfCheetah walking**
+![](./docs/hw2_halfcheetah_video.gif)
 
 ### Implement Generalized Advantage Estimation
 
@@ -125,8 +131,6 @@ for seed in $(seq 1 5); do
 		--batch_size 5000 \
 		--seed $seed --video_log_freq -1
 done
-
-# TODO
 ```
 
 ### Extra Credit: Humanoid
