@@ -61,6 +61,7 @@ def atari_dqn_config(
         ).to(ptu.device)
 
     def make_optimizer(params: torch.nn.ParameterList) -> torch.optim.Optimizer:
+        print("learning rate", learning_rate)
         return torch.optim.Adam(params, lr=learning_rate, eps=adam_eps)
 
     def make_lr_schedule(

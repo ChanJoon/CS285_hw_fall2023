@@ -38,6 +38,7 @@ def basic_dqn_config(
         )
 
     def make_optimizer(params: torch.nn.ParameterList) -> torch.optim.Optimizer:
+        print("learning rate", learning_rate)
         return torch.optim.Adam(params, lr=learning_rate)
 
     def make_lr_schedule(
