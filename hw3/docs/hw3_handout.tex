@@ -28,6 +28,7 @@
 \usepackage{cleveref}
 \usepackage[linesnumbered,ruled,vlined]{algorithm2e}
 \usepackage{kotex}
+\usepackage{graphics}
 \crefname{algorithm}{Algorithm}{Algorithms}
 \Crefname{algorithm}{Algorithm}{Algorithms}
 
@@ -333,6 +334,25 @@ You may assume that $\pi'$ always assigns positive mass to each action. [Hint: r
 
 \section{Deep Q-Learning}
 
+
+\subsection{Implementation}
+
+The first phase of the assignment is to implement a working version of Q-learning, with some extra bells and whistles like double DQN. Our code will work with both state-based environments, where our input is a low-dimensional list of numbers (like Cartpole), but we'll also support learning directly from pixels!
+
+In addition to the double $Q$-learning trick (which you'll implement later), we have a few other tricks implemented to stabilize performance. You don't have to do anything to enable these, but you should look at the implementations and think about why they work.
+\begin{itemize}
+    \item \textbf{Exploration scheduling for $\epsilon$-greedy actor.} This starts $\epsilon$ at a high value, close to random sampling, and decays it to a small value during training.
+    \item \textbf{Learning rate scheduling.} Decay the learning rate from a high initial value to a lower value at the end of training.
+    \item \textbf{Gradient clipping.} If the gradient norm is larger than a threshold, scale the gradients down so that the norm is equal to the threshold.
+    \item \textbf{Atari wrappers.}
+    \begin{itemize}
+        \item \textbf{Frame-skip.} Keep the same constant action for 4 steps.
+        \item \textbf{Frame-stack.} Stack the last 4 frames to use as the input.
+        \item \textbf{Grayscale.} Use grayscale images.
+        % \item \textbf{Fire-reset.} Some Atari games require pressing the ``fire'' button to start the game. In these environments, do this automatically.
+    \end{itemize}
+\end{itemize}
+
 \subsection{Basic Q-Learning}
 
 Implement the basic DQN algorithm. You'll implement an update for the $Q$-network, a target network, and 
@@ -361,6 +381,40 @@ Implement the basic DQN algorithm. You'll implement an update for the $Q$-networ
     \item Run DQN on \verb|CartPole-v1|, but change the \verb|learning rate| to 0.05 (you can change this in the YAML config file). What happens to (a) the predicted $Q$-values, and (b) the critic error? Can you relate this to any topics from class or the analysis section of this homework?
 \end{itemize}
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/hw3_dqn_CartPole_v1.png}
+    \caption{Evaluation return on \texttt{CartPole-v1} with DQN.}
+    \label{fig:cartpole}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{imgs/hw3_dqn_CartPole_v1_lr005_eval_return.png}
+  \caption{Evaluation return on \texttt{CartPole-v1} with \textcolor{blue}{DQN using lr 0.05}.}
+  \label{fig:cartpole_high_lr}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.49\linewidth]{imgs/hw3_dqn_CartPole_v1_lr005_critic_loss.png}
+  \includegraphics[width=0.49\linewidth]{imgs/hw3_dqn_CartPole_v1_lr005_q_values.png}
+  \caption{Left: Critic loss, Right: Predicted Q-values on \texttt{CartPole-v1}. 
+  \textcolor{blue}{\textbf{Blue}} corresponds to a high learning rate (\texttt{lr = 0.05}), while 
+  \textcolor{orange}{\textbf{orange}} shows the default learning rate (\texttt{lr = 0.001}).}
+  \label{fig:cartpole_high_lr_q_and_loss}
+\end{figure}
+
+\begin{tcolorbox}[answerbox, parbox=false]
+  In \Cref{fig:cartpole_high_lr_q_and_loss}, we can see that the critic loss is much noisy and the predicted Q-values increase rapidly. This is because the learning rate is too high, causing the Q-values to oscillate and diverge. The critic loss also becomes unstable, leading to poor performance in the DQN.
+
+  In DQN, the target for training is:
+  \[y_t = r_t + \gamma \max_{a'} Q_{\text{target}} (s_{t+1},a')\]
+  The loss is:
+  \[\mathcal{L}=(Q(s_t,a_t)-y_t)^2\]
+  With a high learning rate $\alpha$, gradient steps $\theta \leftarrow \theta - \alpha \nabla_\theta \mathcal{L}$ are very large, causing the Q-values to update too quickly. This can lead to divergence or oscillation.
+\end{tcolorbox}
+
 \subsection{Double Q-Learning}
 Let's try to stabilize learning. The double-Q trick avoids overestimation bias in the critic update by using two different networks to \textit{select} the next action $a'$ and to \textit{estimate} its value:
 \[a' = \textrm{arg}\max_{a'} Q_{\phi}(s', a')\]
@@ -381,6 +435,13 @@ Implement this functionality in \verb|dqn_agent.py|.
 
     \item Plot the average training return (\verb|train_return|) and eval return (\verb|eval_return|) on the same axes. You may notice that they look very different early in training! Explain the difference.
 \end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{imgs/hw3_double_dqn_MsPacman_Plotonce.png}
+  \caption{The training return (\textcolor{blue}{blue}) and evaluation return (\textcolor{orange}{orange}) for the \texttt{MsPacman-v0} environment, both shown over 1 million steps. The evaluation return reaches above 1500 by the end of training.}
+  \label{fig:double_dqn_mspacman}
+\end{figure}
 
 \subsection{Experimenting with Hyperparameters} Now let's analyze the sensitivity of Q-learning to hyperparameters. Choose one hyperparameter of your choice and run at least three other settings of this hyperparameter, in addition to the one used in Question 1, and plot all four values on the same graph. Your choice what you experiment with, but you should explain why you chose this hyperparameter in the caption. Create four config files in \verb|experiments/dqn/hyperparameters|, and look in \verb|cs285/env_configs/basic_dqn_config.py| to see which hyperparameters you're able to change. You can use any of the base YAML files as a reference.
 
